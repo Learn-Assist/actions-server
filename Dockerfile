@@ -8,6 +8,8 @@ USER root
 
 RUN pip install rasa_sdk
 
+RUN pip install sanic==21.9.3 requests
+
 USER 1001
 
 EXPOSE 5055

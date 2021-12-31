@@ -1,6 +1,6 @@
 from requests import get
 import json
-URL = "http://backend_database:6001"
+URL = "https://learn-assist-database-amnjutsbkq-el.a.run.app"
 
 def getSubjects():
     subjects = get(URL+"/subject?grade=1")

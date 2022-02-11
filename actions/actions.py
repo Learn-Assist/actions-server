@@ -6,6 +6,7 @@ from requests import get
 import api.api1 as api
 import json
 
+
 class ActionInitConversation(Action):
     def name(self) -> Text:
         return "action_init_conversation"
@@ -20,9 +21,9 @@ class ActionInitConversation(Action):
         try:
             if uid == None or uid == "" or not uid or uid == "default":
                 SlotSet("name", "Guest")
-                SlotSet("grade",grade)
+                SlotSet("grade", grade)
             else:
-                user = get("http://localhost:6001/user/{}".format(uid))
+                user = get(api.URL+"/user/{}".format(uid))
                 user = json.loads(user.content)
                 name = user["name"]
                 SlotSet("name", user["name"])
@@ -31,6 +32,7 @@ class ActionInitConversation(Action):
             print("Error {}".format(err))
         dispatcher.utter_message(text="Hello {}! ".format(name))
         return []
+
 
 class ActionAskSubjectLearnForm(Action):
     def name(self) -> Text:
@@ -41,7 +43,7 @@ class ActionAskSubjectLearnForm(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
         print("\nAsk subject Action\n")
-        
+
         message = "What subject do you want to learn? The available subjects are:"
         subjects = api.getSubjects()
         for subject in subjects:
@@ -50,7 +52,9 @@ class ActionAskSubjectLearnForm(Action):
 
         print("message: {}".format(message))
         dispatcher.utter_message(text=message)
+        dispatcher.utter_custom_json({"buttons":subjects})
         return []
+
 
 class ActionAskLessonLearnForm(Action):
     def name(self) -> Text:
@@ -62,9 +66,16 @@ class ActionAskLessonLearnForm(Action):
 
         print("\nAsk lesson Action\n")
         subject = tracker.get_slot("subject_learn")
-        message = "Which lesson in {} do you want to learn? There are {} lessons in {}:".format(subject,api.getLessons(subject),subject)
+        lessons = api.getLessons(subject)
+        message = "Which lesson in {} do you want to learn? There are {} lessons in {}:".format(
+            subject, lessons, subject)
         dispatcher.utter_message(text=message)
+        buttons = []
+        for i in range(0,lessons):
+            buttons.append(i+1)
+        dispatcher.utter_custom_json({"buttons":buttons})
         return []
+
 
 class ActionAskTopicLearnForm(Action):
     def name(self) -> Text:
@@ -75,17 +86,19 @@ class ActionAskTopicLearnForm(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         print("\nAsk topic Action\n")
         subject = tracker.get_slot("subject_learn")
-        message = "What topic do you want to learn? The available topics are: " 
+        message = "What topic do you want to learn? The available topics are: "
         grade = tracker.get_slot("grade")
         lesson = tracker.get_slot("lesson_learn")
-        if not grade: 
+        if not grade:
             grade = 1
-        topics = api.getTopics(subject,grade,lesson)
+        print("Ask topic: {} {} {}".format(subject, grade, lesson))
+        topics = api.getTopics(subject, grade, lesson)
         for topic in topics:
             message = message + "  " + topic
         dispatcher.utter_message(text=message)
-        return []
+        dispatcher.utter_custom_json({"buttons":topics})
 
+        return []
 
 
 class ActionSubmitLearnForm(Action):
@@ -103,9 +116,5 @@ class ActionSubmitLearnForm(Action):
         topic = api.getTopic(subject, lesson, 1, topic_slot)
         print("Topic submit: {}".format(topic))
         contents = topic["contents"]
-        for content in contents:
-            if(content["type"]=="text"):
-                message = message + "\n" + content["content"]
-        dispatcher.utter_message(text=message)
+        dispatcher.utter_custom_json(contents)
         return []
-

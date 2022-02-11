@@ -1,7 +1,7 @@
 from requests import get
 import json
-#URL = "https://learn-assist-database-amnjutsbkq-el.a.run.app"
-URL = "http://localhost:8080"
+URL = "https://learn-assist-database-amnjutsbkq-el.a.run.app"
+#URL = "http://localhost:8080"
 
 
 def getSubjects():

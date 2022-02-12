@@ -7,6 +7,18 @@ import api.api1 as api
 import json
 
 
+class ActionGreet(Action):
+    def name(self) -> Text:
+        return "action_greet"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        dispatcher.utter_message(text="I am your personal Learning Assistant. How may I help you?")
+        dispatcher.utter_custom_json({"buttons":["I want to learn something.", "Are you a bot?", "I want to take a test."]})
+
+        return []
 class ActionInitConversation(Action):
     def name(self) -> Text:
         return "action_init_conversation"

@@ -21,6 +21,8 @@ def getLessons(subject) -> int:
         return 5
     elif subject == "science":
         return 5
+    elif subject == "math":
+        return 5
     else:
         return 0
 
